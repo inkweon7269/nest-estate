@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseArrayPipe,
   Post,
   Query,
   UseGuards,
@@ -38,13 +39,22 @@ export class FavoriteController {
   })
   @ApiOkResponse({ description: '조회 성공' })
   @Get()
-  getAllFavorites(@Query() input: AptPageInput, @GetUser() user: UserEntity) {
-    return this.favoriteService.getAllFavorites(input, user);
+  getAllFavorites(
+    @Query() input: AptPageInput,
+    @Query('ids', new ParseArrayPipe({ items: Number, separator: ',' }))
+    ids: number[],
+    @GetUser() user: UserEntity,
+  ) {
+    const result = {
+      ...input,
+      ids,
+    };
+    return this.favoriteService.getAllFavorites(result, user);
   }
 
-  @Post('/:id')
+  @Post()
   @UsePipes(ValidationPipe)
-  createFavorite(@Param('id') aptId: number, @GetUser() user: UserEntity) {
+  createFavorite(@Body('id') aptId: number, @GetUser() user: UserEntity) {
     return this.favoriteService.createFavorite(aptId, user);
   }
 

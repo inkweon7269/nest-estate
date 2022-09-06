@@ -5,16 +5,24 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AptUserBridgeEntity } from '../entities/apt-user-bridge.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { UserEntity } from '../entities/user.entity';
-import { AptPageInput, RangePageInput } from '../common/dtos/input-value.dto';
+import { AptPageInput } from '../common/dtos/input-value.dto';
 import { getSkip } from '../common/common.function';
+import { AptDealEntity } from '../entities/apt-deal.entity';
+import { AptEntity } from '../entities/apt.entity';
+import { DealStatus } from '../crawling/crawling-status.enum';
+import { last } from 'rxjs';
 
 @Injectable()
 export class FavoriteService {
   constructor(
     @InjectRepository(AptUserBridgeEntity)
     private readonly aptUserBridgeRepo: Repository<AptUserBridgeEntity>,
+    @InjectRepository(AptEntity)
+    private readonly aptRepo: Repository<AptEntity>,
+    @InjectRepository(AptDealEntity)
+    private readonly aptDealRepo: Repository<AptDealEntity>,
   ) {}
 
   async getFavoriteSimple(user: UserEntity) {
@@ -30,32 +38,27 @@ export class FavoriteService {
     return result;
   }
 
-  async getAllFavorites({ page, limit, apt }: AptPageInput, user: UserEntity) {
+  async getAllFavorites({ page, limit, ids, status }: AptPageInput, user: UserEntity) {
     const { skip, take } = getSkip(page, limit);
-    const [list, count] = await this.aptUserBridgeRepo.findAndCount({
-      select: {
-        apt: {
-          id: true,
-          buildAt: true,
-          address: true,
-          name: true,
-          people: true,
-          group: true,
-        },
-      },
+    const [list, count] = await this.aptDealRepo.findAndCount({
       relations: {
-        apt: true,
+        apt: {
+          aptUserBridges: true,
+        },
       },
       where: {
+        ...(status && { status: status }),
         apt: {
-          ...(apt && { id: apt }),
+          ...(ids.length && { id: In(ids) }),
+          aptUserBridges: {
+            userId: user.id,
+          },
         },
-        userId: user.id,
       },
       skip,
       take,
       order: {
-        createAt: 'desc',
+        dealDate: 'desc',
       },
     });
 

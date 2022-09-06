@@ -17,8 +17,8 @@ export class AptController {
   })
   @ApiOkResponse({ description: '조회 성공' })
   @Get('/simple')
-  getAllApts() {
-    return this.aptService.getAllApts();
+  getAptSimple() {
+    return this.aptService.getAptSimple();
   }
 
   @ApiOperation({

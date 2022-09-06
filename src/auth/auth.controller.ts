@@ -27,6 +27,7 @@ export class AuthController {
   @UseGuards(AuthGuard())
   @Serialize(UserDto)
   getProfile(@GetUser() user: UserEntity) {
+
     return user;
   }
 }

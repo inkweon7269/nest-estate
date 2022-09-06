@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber } from 'class-validator';
+import { IsArray, IsNumber } from 'class-validator';
 import { IsOptionalString } from '../../decorators/optional-string.decorator';
 import { Type } from 'class-transformer';
 import { DealStatus } from '../../crawling/crawling-status.enum';
@@ -37,6 +37,9 @@ export class AptPageInput extends RangePageInput {
   @ApiProperty({ description: '아파트 ID' })
   @IsNumber()
   apt?: number;
+
+  @IsArray()
+  ids?: number[];
 
   @ApiProperty({ description: '아파트 거래 조회' })
   @IsOptionalEnum(DealStatus)

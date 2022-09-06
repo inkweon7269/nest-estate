@@ -15,7 +15,7 @@ export class AptService {
     private readonly aptDealRepo: Repository<AptDealEntity>,
   ) {}
 
-  async getAllApts() {
+  async getAptSimple() {
     const result = await this.aptRepo.find();
     return result;
   }
