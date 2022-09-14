@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AptUserBridgeEntity } from '../entities/apt-user-bridge.entity';
-import { In, Repository } from 'typeorm';
+import { Between, In, Repository } from 'typeorm';
 import { UserEntity } from '../entities/user.entity';
 import { AptPageInput } from '../common/dtos/input-value.dto';
 import { getSkip } from '../common/common.function';
@@ -38,8 +38,13 @@ export class FavoriteService {
     return result;
   }
 
-  async getAllFavorites({ page, limit, ids, status }: AptPageInput, user: UserEntity) {
+  async getAllFavorites(
+    { page, limit, ids, status, startDate, endDate }: AptPageInput,
+    user: UserEntity,
+  ) {
     const { skip, take } = getSkip(page, limit);
+
+    const idsArr = ids ? ids.split(',') : null;
     const [list, count] = await this.aptDealRepo.findAndCount({
       relations: {
         apt: {
@@ -48,8 +53,12 @@ export class FavoriteService {
       },
       where: {
         ...(status && { status: status }),
+        ...(startDate &&
+          endDate && {
+            dealDate: Between(new Date(startDate), new Date(endDate)),
+          }),
         apt: {
-          ...(ids.length && { id: In(ids) }),
+          ...(idsArr && { id: In(idsArr) }),
           aptUserBridges: {
             userId: user.id,
           },

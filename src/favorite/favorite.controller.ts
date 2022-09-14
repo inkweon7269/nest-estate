@@ -41,15 +41,15 @@ export class FavoriteController {
   @Get()
   getAllFavorites(
     @Query() input: AptPageInput,
-    @Query('ids', new ParseArrayPipe({ items: Number, separator: ',' }))
-    ids: number[],
+    // @Query('ids', new ParseArrayPipe({ items: Number, separator: ',' }))
+    // ids: number[],
     @GetUser() user: UserEntity,
   ) {
-    const result = {
-      ...input,
-      ids,
-    };
-    return this.favoriteService.getAllFavorites(result, user);
+    // const result = {
+    //   ...input,
+    //   ids,
+    // };
+    return this.favoriteService.getAllFavorites(input, user);
   }
 
   @Post()
