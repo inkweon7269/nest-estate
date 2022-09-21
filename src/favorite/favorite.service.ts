@@ -84,6 +84,27 @@ export class FavoriteService {
     const idsArr = ids ? ids.split(',') : null;
 
     const found = await this.aptRepo.find({
+      select: {
+        buildAt: true,
+        address: true,
+        name: true,
+        people: true,
+        group: true,
+        deals: {
+          dealDate: true,
+          money: true,
+          floor: true,
+          dong: true,
+          type: true,
+          area: true,
+          status: true,
+        },
+        aptUserBridges: {
+          createAt: false,
+          userId: false,
+          aptId: false,
+        },
+      },
       relations: {
         deals: true,
         aptUserBridges: true,
