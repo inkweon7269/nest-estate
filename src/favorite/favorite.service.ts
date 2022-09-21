@@ -85,6 +85,7 @@ export class FavoriteService {
 
     const found = await this.aptRepo.find({
       select: {
+        id: true,
         buildAt: true,
         address: true,
         name: true,
