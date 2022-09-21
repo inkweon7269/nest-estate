@@ -52,6 +52,19 @@ export class FavoriteController {
     return this.favoriteService.getAllFavorites(input, user);
   }
 
+  @ApiOperation({
+    summary: '즐겨찾기 아파트 차트 조회',
+    description: '즐겨찾기 아파트 차트 조회',
+  })
+  @ApiOkResponse({ description: '조회 성공' })
+  @Get('/charts')
+  getAllChartFavorites(
+    @Query() input: AptPageInput,
+    @GetUser() user: UserEntity,
+  ) {
+    return this.favoriteService.getAllChartFavorites(input, user);
+  }
+
   @Post()
   @UsePipes(ValidationPipe)
   createFavorite(@Body('id') aptId: number, @GetUser() user: UserEntity) {

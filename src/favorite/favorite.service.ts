@@ -77,6 +77,34 @@ export class FavoriteService {
     };
   }
 
+  async getAllChartFavorites(
+    { page, limit, ids, status, startDate, endDate }: AptPageInput,
+    user: UserEntity,
+  ) {
+    const idsArr = ids ? ids.split(',') : null;
+
+    const found = await this.aptRepo.find({
+      relations: {
+        deals: true,
+        aptUserBridges: true,
+      },
+      where: {
+        deals: {
+          ...(startDate &&
+            endDate && {
+              dealDate: Between(new Date(startDate), new Date(endDate)),
+            }),
+        },
+        aptUserBridges: {
+          userId: user.id,
+          ...(idsArr && { aptId: In(idsArr) }),
+        },
+      },
+    });
+
+    return found;
+  }
+
   async getFavoriteById(aptId: number, user: UserEntity) {
     const found = await this.aptUserBridgeRepo.findOne({
       where: {
