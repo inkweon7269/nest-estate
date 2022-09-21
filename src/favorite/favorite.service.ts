@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AptUserBridgeEntity } from '../entities/apt-user-bridge.entity';
 import { Between, In, Repository } from 'typeorm';
@@ -12,7 +8,6 @@ import { getSkip } from '../common/common.function';
 import { AptDealEntity } from '../entities/apt-deal.entity';
 import { AptEntity } from '../entities/apt.entity';
 import { DealStatus } from '../crawling/crawling-status.enum';
-import { last } from 'rxjs';
 
 @Injectable()
 export class FavoriteService {
@@ -23,7 +18,8 @@ export class FavoriteService {
     private readonly aptRepo: Repository<AptEntity>,
     @InjectRepository(AptDealEntity)
     private readonly aptDealRepo: Repository<AptDealEntity>,
-  ) {}
+  ) {
+  }
 
   async getFavoriteSimple(user: UserEntity) {
     const result = await this.aptUserBridgeRepo.find({
@@ -124,7 +120,20 @@ export class FavoriteService {
       },
     });
 
-    return found;
+
+    return found.map(item => {
+      const { id, buildAt, address, name, people, group, deals } = item;
+      return {
+        id,
+        buildAt,
+        address,
+        name,
+        people,
+        group,
+        rentDeals: deals.filter((jtem) => jtem.status === DealStatus.RENT),
+        buyDeals: deals.filter((jtem) => jtem.status === DealStatus.BUY),
+      };
+    });
   }
 
   async getFavoriteById(aptId: number, user: UserEntity) {
