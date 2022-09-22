@@ -135,6 +135,9 @@ export class FavoriteService {
         group,
         rentDeals: deals
           .filter((jtem) => jtem.status === DealStatus.RENT)
+          .sort((a, b) =>
+            dayjs(a.dealDate).isAfter(dayjs(b.dealDate)) ? 1 : -1,
+          )
           .map((jtem) => {
             if (jtem) {
               return {
@@ -144,10 +147,12 @@ export class FavoriteService {
             }
 
             return [];
-          })
-          .reverse(),
+          }),
         buyDeals: deals
           .filter((jtem) => jtem.status === DealStatus.BUY)
+          .sort((a, b) =>
+            dayjs(a.dealDate).isAfter(dayjs(b.dealDate)) ? 1 : -1,
+          )
           .map((jtem) => {
             if (jtem) {
               return {
@@ -157,8 +162,7 @@ export class FavoriteService {
             }
 
             return [];
-          })
-          .reverse(),
+          }),
       };
     });
   }
