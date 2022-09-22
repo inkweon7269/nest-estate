@@ -13,6 +13,7 @@ import { AptDealEntity } from '../entities/apt-deal.entity';
 import { AptEntity } from '../entities/apt.entity';
 import { DealStatus } from '../crawling/crawling-status.enum';
 import * as dayjs from 'dayjs';
+import * as _ from 'lodash';
 
 @Injectable()
 export class FavoriteService {
@@ -133,6 +134,28 @@ export class FavoriteService {
         name,
         people,
         group,
+        areas: _.uniqBy(
+          deals
+            .map((item) => ({ label: item.area, value: item.area }))
+            .sort((a, b) => a.value - b.value),
+          (e) => {
+            return e.value;
+          },
+        ),
+        deals: deals
+          .sort((a, b) =>
+            dayjs(a.dealDate).isAfter(dayjs(b.dealDate)) ? -1 : 1,
+          )
+          .map((jtem) => {
+            if (jtem) {
+              return {
+                ...jtem,
+                dealDate: dayjs(jtem.dealDate).format('YYYY-MM-DD'),
+              };
+            }
+
+            return [];
+          }),
         rentDeals: deals
           .filter((jtem) => jtem.status === DealStatus.RENT)
           .sort((a, b) =>
