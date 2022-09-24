@@ -10,7 +10,7 @@ export class AptDealEntity extends CommonEntity {
   @Type(() => Date)
   dealDate: Date;
 
-  @Column()
+  @Column({ type: 'bigint' })
   money: number;
 
   @Column()
