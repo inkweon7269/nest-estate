@@ -24,7 +24,8 @@ export class FavoriteService {
     private readonly aptRepo: Repository<AptEntity>,
     @InjectRepository(AptDealEntity)
     private readonly aptDealRepo: Repository<AptDealEntity>,
-  ) {}
+  ) {
+  }
 
   async getFavoriteSimple(user: UserEntity) {
     const result = await this.aptUserBridgeRepo.find({
@@ -36,7 +37,12 @@ export class FavoriteService {
       },
     });
 
-    return result;
+    return result.map((item) => {
+      return {
+        label: item.apt.name,
+        value: item.aptId,
+      };
+    });
   }
 
   async getAllFavorites(
@@ -123,6 +129,11 @@ export class FavoriteService {
           ...(idsArr && { aptId: In(idsArr) }),
         },
       },
+      order: {
+        deals: {
+          dealDate: 'DESC',
+        },
+      },
     });
 
     return found.map((item) => {
@@ -142,6 +153,18 @@ export class FavoriteService {
             return e.value;
           },
         ),
+        deals: deals.map((jtem) => {
+          if (jtem) {
+            return {
+              ...jtem,
+              dealDate: dayjs(jtem.dealDate).format('YYYY-MM-DD'),
+            };
+          }
+
+          return [];
+        }),
+
+        /*
         deals: deals
           .sort((a, b) =>
             dayjs(a.dealDate).isAfter(dayjs(b.dealDate)) ? -1 : 1,
@@ -185,7 +208,7 @@ export class FavoriteService {
             }
 
             return [];
-          }),
+          }),*/
       };
     });
   }
